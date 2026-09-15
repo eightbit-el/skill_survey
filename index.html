@@ -447,7 +447,7 @@ function renderW(){
   <div class="eyebrow3">全従業員対象</div>
   <h2>従業員スキル調査</h2>
   <p class="lead3">全社のスキルマップを作るための調査です。すべて選択式です。</p>
-  <div class="clock"><span class="cl">所要時間</span><span class="cv">約15分</span></div>
+  <div class="clock"><span class="cl">所要時間</span><span class="cv">約10分</span></div>
   <div class="note3">回答は評価・処遇には使いません。</div>
   <div><button class="btn3" data-act="next">始める</button></div>
   </div>`;
@@ -602,14 +602,7 @@ function renderZ(){
   const rows0=keys.map(k=>{const sc=SECTIONS.find(s=>s.k===k);const er=secErrors(k);const skip=k==='B'&&S.A.exp&&S.A.exp!=='あり';return `<tr><td>${sc.t}</td><td>${skip?'<span style="color:var(--ink-3)">省略</span>':(er.length?`<span class="badge-ng">未入力 ${er.length}件</span> <span style="font-size:12px;color:var(--ink-3)">${er.slice(0,6).join(', ')}${er.length>6?'…':''}</span>`:'<span class="badge-ok">入力済み</span>')}</td><td><button class="btn ghost small" data-act="go" data-v="${k}">開く</button></td></tr>`;}).join('');
   const nProd=Object.keys(S.C.depth).length, nCert=Object.keys(S.D.certs).length;
   const rows=rows0;
-  const zrow=(id,label,val,act,lock,opts)=>`<tr><td>${id} ${label}</td><td>${seg(opts,val,act)}</td><td>${autoPill(lock)}</td></tr>`;
-  const zcard=S.A.exp==='あり'?`<div class="q"><div class="qh"><span class="qt">集計結果の確認<span class="count">案件履歴から自動計算。履歴に載っていない経験があれば直してください</span></span></div><table class="mx"><tr><th>項目</th><th>値</th><th></th></tr>
-  ${zrow('Z-1','一番上の役割',S.Z.role,'Z.role',S.Z.lock.role,ROLE_ORDER)}
-  ${zrow('Z-2','リーダー以上の通算年数',S.Z.lead,'Z.lead',S.Z.lock.lead,BANDS)}
-  ${zrow('Z-3','運用・監視・サービスデスクの職歴',S.Z.ops,'Z.ops',S.Z.lock.ops,BANDS)}
-  ${zrow('Z-4','マネジメント・PMOの職歴',S.Z.mgmt,'Z.mgmt',S.Z.lock.mgmt,BANDS)}</table></div>`:'';
   return `<div class="sec-head"><h2>確認・送信</h2></div><p class="lead">未入力があれば「開く」で戻れます。問題なければ送信してください。</p>
-  ${zcard}
   <div class="q"><table class="mx"><tr><th>画面</th><th>状態</th><th></th></tr>${rows}</table></div>
   <div class="q summary"><dl><dt>案件数</dt><dd>${S.A.exp==='あり'?S.B.length:0}</dd><dt>選択した業務(のべ)</dt><dd>${S.B.reduce((a,p)=>a+p.tasks.length,0)}</dd><dt>深度を付けた製品</dt><dd>${nProd}</dd><dt>資格</dt><dd>${nCert}</dd></dl></div>
   <div class="foot"><button class="btn ghost" data-act="go" data-v="E">戻る</button><button class="btn" data-act="submit">送信</button></div>
@@ -679,8 +672,17 @@ document.addEventListener('click',ev=>{
   if(act==='D.toggle'){S.optOpen['Dc:'+v]=!S.optOpen['Dc:'+v];render();return;}
   if(act==='submit'){submitAnswers();return;}
 });
+function firstIncompleteSection(){
+  const keys=['P','A','B','C','D','E'].filter(k=>!(k==='B'&&S.A.exp&&S.A.exp!=='あり'));
+  return keys.find(k=>secErrors(k).length>0);
+}
 async function submitAnswers(){
   const out=byId('out');
+  if(firstIncompleteSection()){
+    out.innerHTML=`<div class="q summary err"><p style="margin-top:0"><span class="badge-ng">未入力項目があります。</span> 上の表で「未入力」の画面を確認してください。</p></div>`;
+    out.scrollIntoView({behavior:'smooth'});
+    return;
+  }
   out.innerHTML=`<div class="q summary"><p style="margin-top:0">送信中…</p></div>`;
   out.scrollIntoView({behavior:'smooth'});
   try{
