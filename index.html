@@ -423,7 +423,7 @@ function renderLogin(msg){
   byId('progText').textContent='';
   byId('progBar').style.width='0%';
   byId('remain').textContent='';
-  byId('main').innerHTML=`<div class="welcome"><h2>従業員スキル調査</h2><p class="lead">氏名を入力してください。</p>
+  byId('main').innerHTML=`<div class="welcome"><h2>従業員スキル調査</h2><p class="lead">氏名を入力してください。<br><span style="font-size:13px;color:var(--ink-3)">姓と名の間にスペースは入力しないでください(例: 山田太郎)</span></p>
   <div class="row" style="margin:16px 0"><input type="text" id="loginName" placeholder="氏名(例: 山田太郎)" style="min-width:220px"><button class="btn" id="loginBtn">次へ</button></div>
   ${msg?`<p class="msg">${esc(msg)}</p>`:''}</div>`;
   byId('loginBtn').onclick=doLogin;
